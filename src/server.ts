@@ -10,7 +10,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8000;
 
-app.use('/', api);
+app.use('/api', api);
 
 app.listen(PORT, () => {
   console.log(`Server running in ${PORT} on ${process.env.NODE_ENV}`);

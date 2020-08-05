@@ -1,4 +1,12 @@
 import { Request, Response } from 'express';
+import { Client } from 'pg';
+
+// const client = new Client({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
 
 export async function test(req: Request, res: Response) {
   res.status(200).json({
