@@ -3,19 +3,31 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env' });
 
-const configOptions = {
-  client: 'pg',
-  connection: {
-    database: process.env.DBNAME,
-    user: process.env.DBUSER,
-    host: process.env.DBHOST,
-    port: process.env.DBPORT,
-  },
-  migrations: {
-    directory: 'src/migrations',
-  },
-  seeds: { directory: 'src/seeds' },
-};
+let configOptions: knex.Config;
+if (process.env.NODE_ENV === 'development') {
+  configOptions = {
+    client: 'pg',
+    connection: {
+      database: process.env.DBNAME,
+      user: process.env.DBUSER,
+      host: process.env.DBHOST,
+      port: Number(process.env.DBPORT),
+    },
+    migrations: {
+      directory: 'src/migrations',
+    },
+    seeds: { directory: 'src/seeds' },
+  };
+} else {
+  configOptions = {
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
+    migrations: {
+      directory: 'src/migrations',
+    },
+    seeds: { directory: 'src/seeds' },
+  };
+}
 
 const knexClient = knex(configOptions);
 
