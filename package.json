@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "heroku-postbuild": "npm run initDB && npm run migrate",
+    "heroku-postbuild": "npm run build && npm run initDB && npm run migrate",
     "initDB": "node dist/db/init.js",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
