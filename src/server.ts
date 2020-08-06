@@ -1,7 +1,12 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import api from './routes/api';
-import { createGraph, Point, getPoints } from './db/queries';
+import {
+  createGraph,
+  Point,
+  getPoints2,
+  arrayToMultipleInsert,
+} from './db/queries';
 
 dotenv.config({ path: '.env' });
 
@@ -9,58 +14,41 @@ const app = express();
 
 app.use(express.json());
 
-// const pool = new Pool({
-//   user: process.env.DBUSER,
-//   host: process.env.DBHOST,
-//   database: process.env.DBNAME,
-//   port: Number(process.env.DBPORT),
-// });
-//
+const parr: Point[] = [
+  {
+    point_label: '12:32',
+    point_value: 45,
+  },
+  {
+    point_label: '12:32',
+    point_value: 45,
+  },
+  {
+    point_label: '12:32',
+    point_value: 45,
+  },
+  {
+    point_label: '12:32',
+    point_value: 45,
+  },
+  {
+    point_label: '12:32',
+    point_value: 45,
+  },
+  {
+    point_label: '12:32',
+    point_value: 45,
+  },
+];
 
-// pool.query(
-//   "INSERT INTO graphs(description) VALUES('this is another graph2') RETURNING graph_id",
-//   (err, res) => {
-//     if (err) throw err;
-//     if (res.rows.length > 0) {
-//       const [{ graph_id }] = res.rows;
-//       console.log(graph_id);
-//     }
-//     console.log(JSON.stringify(res.rows));
-//   }
+// const res = arrayToMultipleInsert(parr, 'asd');
+// console.log(res);
+
+createGraph('asddd', parr);
+
+// const res = getPoints2('d393f9ce-91e1-4f44-88f2-4c9590027275').then((r) =>
+//   console.log(r)
 // );
-
-// const parr: Point[] = [
-//   {
-//     point_label: '12:32',
-//     point_value: 45,
-//   },
-//   {
-//     point_label: '12:32',
-//     point_value: 45,
-//   },
-//   {
-//     point_label: '12:32',
-//     point_value: 45,
-//   },
-//   {
-//     point_label: '12:32',
-//     point_value: 45,
-//   },
-//   {
-//     point_label: '12:32',
-//     point_value: 45,
-//   },
-//   {
-//     point_label: '12:32',
-//     point_value: 45,
-//   },
-// ];
-
-// createGraph('asddd', parr);
-
-const res = getPoints('b204ad66-9f24-417a-a6a2-ebb1a85c5348').then((r) =>
-  console.log(r)
-);
 
 const PORT = process.env.PORT || 8000;
 
