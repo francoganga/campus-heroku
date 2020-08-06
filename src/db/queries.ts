@@ -1,60 +1,60 @@
-import { Pool } from 'pg';
+import knex from 'knex';
+import dotenv from 'dotenv';
 
-const pool = new Pool({
-  user: 'franco',
-  host: 'localhost',
-  database: 'graphs',
-  port: 5432,
-});
+dotenv.config({ path: '.env' });
 
-export async function getPoints(graph_id: string) {
-  try {
-    const res = await pool.query(
-      `SELECT point_label, point_value from points where graph_id='${graph_id}'`
-    );
-    const { rows } = res;
+const configOptions = {
+  client: 'pg',
+  connection: {
+    database: process.env.DBNAME,
+    user: process.env.DBUSER,
+    host: process.env.DBHOST,
+    port: process.env.DBPORT,
+  },
+  migrations: {
+    directory: 'src/migrations',
+  },
+  seeds: { directory: 'src/seeds' },
+};
 
-    if (rows.length > 0) {
-      return rows;
-    }
-  } catch (error) {
-    console.error(error);
-  }
+const knexClient = knex(configOptions);
+
+export interface Graph {
+  description: string;
+  points: Point[];
 }
 
 export interface Point {
   point_label: string;
   point_value: number;
 }
-export function createGraph(description: string, points: Point[]) {
-  pool.query(
-    `INSERT INTO graphs(description) VALUES(${description}) RETURNING graph_id`,
-    (err, res) => {
-      if (err) throw err;
-      const { rows } = res;
-      if (rows.length > 0) {
-        const [{ graph_id }] = rows;
 
-        const values = arrayToMultipleInsert(points, graph_id);
-
-        pool.query(
-          `
-          INSERT INTO points(graph_id, point_label, point_value)
-          VALUES ${values}
-          `
-        );
-      } else {
-        throw new Error('there was an error');
-      }
-
-      pool.query(`INSERT INTO points`);
-    }
-  );
+export async function getPoints2(graph_id: string) {
+  return await knexClient('points')
+    .where({
+      graph_id,
+    })
+    .select('point_label', 'point_value', 'id');
 }
 
-function arrayToMultipleInsert(values: Point[], graph_id: string) {
-  return values
-    .map((e) => `('${graph_id}', ${e.point_label},'${e.point_value}')`)
-    .join(',')
-    .concat(';');
+export async function createGraph(description: string, points: Point[]) {
+  try {
+    const id: string[] = await knexClient('graphs')
+      .returning('graph_id')
+      .insert({
+        description,
+      });
+    const values = arrayToMultipleInsert(points, id[0]);
+    const pres = await knexClient('points').returning('*').insert(values);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export function arrayToMultipleInsert(values: Point[], graph_id: string) {
+  return values.map((e) => ({
+    graph_id,
+    point_label: e.point_label,
+    point_value: e.point_value,
+  }));
 }
