@@ -15,6 +15,8 @@ export async function test(req: Request, res: Response) {
   });
 }
 
+export async function getGraph(req: Request, res: Response) {}
+
 export async function createGraphRequest(req: Request, res: Response) {
   if (req.body.graph === undefined) {
     res.status(400).json({
