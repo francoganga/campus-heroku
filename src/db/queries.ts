@@ -41,12 +41,12 @@ export interface Point {
   point_value: number;
 }
 
-export async function getPoints2(graph_id: string) {
+export async function getPoints(graph_id: string) {
   return await knexClient('points')
     .where({
       graph_id,
     })
-    .select('point_label', 'point_value', 'id');
+    .select('point_label', 'point_value');
 }
 
 export async function createGraph(description: string, points: Point[]) {
