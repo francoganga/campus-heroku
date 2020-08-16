@@ -31,42 +31,21 @@ if (process.env.NODE_ENV === 'development') {
 
 const knexClient = knex(configOptions);
 
-export interface Graph {
-  description: string;
-  points: Point[];
-}
-
 export interface Point {
-  point_label: string;
-  point_value: number;
+  date: string;
+  navigation: number;
+  login: number;
+  click_1: number;
+  click_2: number;
 }
 
-export async function getPoints(graph_id: string) {
+export async function getPoints(from: string, to: string) {
   return await knexClient('points')
-    .where({
-      graph_id,
-    })
-    .select('point_label', 'point_value');
+    .where('date', '>', from)
+    .andWhere('date', '<', to)
+    .select('label', 'navigation');
 }
 
-export async function createGraph(description: string, points: Point[]) {
-  try {
-    const id: string[] = await knexClient('graphs')
-      .returning('graph_id')
-      .insert({
-        description,
-      });
-    const values = arrayToMultipleInsert(points, id[0]);
-    const pres = await knexClient('points').returning('*').insert(values);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-export function arrayToMultipleInsert(values: Point[], graph_id: string) {
-  return values.map((e) => ({
-    graph_id,
-    point_label: e.point_label,
-    point_value: e.point_value,
-  }));
+export async function createPoint(point: Point) {
+  await knexClient('points').insert(point);
 }
