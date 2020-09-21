@@ -8,8 +8,44 @@ import { format, parse } from 'date-fns';
 //     rejectUnauthorized: false,
 //   },
 // });
+//
+//
 
-export async function test(_: Request, res: Response) {}
+export interface InputPoint {
+  date: string;
+  navigation: number;
+  login: number;
+  click_1: number;
+  click_2: number;
+}
+
+export async function insertPoint(req: Request, res: Response) {
+  const { point }: { point: InputPoint } = req.body;
+
+  if (point) {
+    try {
+      console.log(point);
+      const parsedDate = parse(point.date, 'dd-MM-yyyy', new Date());
+
+      const toInsert = {
+        date: parsedDate,
+        navigation: point.navigation,
+        login: point.login,
+        click_1: point.click_1,
+        click_2: point.click_2,
+      };
+      console.log(toInsert);
+
+      const result = await createPoint(toInsert);
+      return res.status(200).json({
+        succes: true,
+        data: result,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
 
 export async function getGraphData(req: Request, res: Response) {
   if (req.query.fromDate === undefined || req.query.toDate === undefined) {

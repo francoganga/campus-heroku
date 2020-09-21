@@ -34,8 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 const knexClient = knex(configOptions);
 
 export interface Point {
-  id: string;
-  date: string;
+  date: Date;
   navigation: number;
   login: number;
   click_1: number;
@@ -54,5 +53,5 @@ export async function getPoints(from: string, to: string) {
 }
 
 export async function createPoint(point: Point) {
-  await knexClient('points').insert(point);
+  await knexClient('points').insert(point).returning('*');
 }
