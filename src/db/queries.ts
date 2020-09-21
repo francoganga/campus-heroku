@@ -1,5 +1,6 @@
 import knex from 'knex';
 import dotenv from 'dotenv';
+import { cs } from 'date-fns/locale';
 
 dotenv.config({ path: '.env' });
 
@@ -10,6 +11,7 @@ if (process.env.NODE_ENV === 'development') {
     connection: {
       database: process.env.DBNAME,
       user: process.env.DBUSER,
+      password: process.env.DBPASS,
       host: process.env.DBHOST,
       port: Number(process.env.DBPORT),
     },
@@ -32,6 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 const knexClient = knex(configOptions);
 
 export interface Point {
+  id: string;
   date: string;
   navigation: number;
   login: number;
@@ -40,10 +43,14 @@ export interface Point {
 }
 
 export async function getPoints(from: string, to: string) {
-  return await knexClient('points')
-    .where('date', '>', from)
-    .andWhere('date', '<', to)
-    .select('label', 'navigation');
+  try {
+    const results = await knexClient('points')
+      .select()
+      .whereBetween('date', [from, to]);
+    return results;
+  } catch (e) {
+    console.error(e.message);
+  }
 }
 
 export async function createPoint(point: Point) {

@@ -3,12 +3,14 @@ import { Client } from 'pg';
 
 dotenv.config({ path: '.env' });
 
-const client = new Client({
+const clientArgs = {
   user: process.env.DBUSER,
+  password: 'asd123',
   host: process.env.DBHOST,
   database: 'postgres',
   port: Number(process.env.DBPORT),
-});
+};
+const client = new Client(clientArgs);
 
 (async () => {
   try {
